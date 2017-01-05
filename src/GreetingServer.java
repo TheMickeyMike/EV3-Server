@@ -1,5 +1,7 @@
 // File Name GreetingServer.java
 
+import model.Transaction;
+
 import java.net.*;
 import java.io.*;
 
@@ -21,29 +23,39 @@ public class GreetingServer extends Thread
             {
                 System.out.println("Waiting for client on port " +
                         serverSocket.getLocalPort() + "...");
-                Socket server = serverSocket.accept();
+                Socket clientSocket  = serverSocket.accept();
                 System.out.println("Just connected to "
-                        + server.getRemoteSocketAddress());
-                DataInputStream in =
-                        new DataInputStream(server.getInputStream());
-                String code = in.readUTF();
-                System.out.println("Code: " + code);
-//                DataOutputStream out =
-//                        new DataOutputStream(server.getOutputStream());
-//                out.writeUTF("Thank you for connecting to "
-//                        + server.getLocalSocketAddress() + "\nGoodbye!");
-                server.close();
+                        + clientSocket.getRemoteSocketAddress());
+
+                DataOutputStream outFromServer = new DataOutputStream(clientSocket.getOutputStream());
+                ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
+
+                Transaction transaction = (Transaction) inFromClient.readObject();
+
+                if(transaction != null) {
+                    outFromServer.writeInt(200);
+                    beginTransaction(transaction);
+                } else {
+                    outFromServer.writeInt(404);
+                }
+
+                clientSocket.close();
             }catch(SocketTimeoutException s)
             {
                 System.out.println("Socket timed out!");
                 break;
-            }catch(IOException e)
+            }catch(Exception e)
             {
                 e.printStackTrace();
                 break;
             }
         }
     }
+
+    private void beginTransaction(Transaction transaction) {
+
+    }
+
     public static void main(String [] args)
     {
         int port = Integer.parseInt("3456");
