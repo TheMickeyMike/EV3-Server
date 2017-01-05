@@ -1,7 +1,5 @@
 // File Name GreetingServer.java
 
-import model.Transaction;
-
 import java.net.*;
 import java.io.*;
 
@@ -12,7 +10,7 @@ public class GreetingServer extends Thread
     public GreetingServer(int port) throws IOException
     {
         serverSocket = new ServerSocket(port);
-        serverSocket.setSoTimeout(100000);
+        serverSocket.setSoTimeout(10000000);
     }
 
     public void run()
@@ -28,13 +26,14 @@ public class GreetingServer extends Thread
                         + clientSocket.getRemoteSocketAddress());
 
                 DataOutputStream outFromServer = new DataOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream inFromClient = new ObjectInputStream(clientSocket.getInputStream());
+                DataInputStream inFromClient = new DataInputStream(clientSocket.getInputStream());
 
-                Transaction transaction = (Transaction) inFromClient.readObject();
+                String transactionJSON = inFromClient.readUTF();
+                System.out.println(transactionJSON);
 
-                if(transaction != null) {
+                if(!transactionJSON.equals("")) {
                     outFromServer.writeInt(200);
-                    beginTransaction(transaction);
+                    beginTransaction(transactionJSON);
                 } else {
                     outFromServer.writeInt(404);
                 }
@@ -52,7 +51,7 @@ public class GreetingServer extends Thread
         }
     }
 
-    private void beginTransaction(Transaction transaction) {
+    private void beginTransaction(String transaction) {
 
     }
 
