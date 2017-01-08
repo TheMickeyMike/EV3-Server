@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Created by Mateusz on 14.12.2016.
  */
 public class Transaction implements Serializable {
-    private static final long serialVersionUID = 345786L;
     private String transaction_id;
     private String status;
     private String account_id;
